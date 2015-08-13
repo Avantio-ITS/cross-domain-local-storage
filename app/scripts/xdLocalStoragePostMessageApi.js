@@ -6,51 +6,74 @@
 (function () {
 
   var MESSAGE_NAMESPACE = 'cross-domain-local-message';
+  var allowedOriginsAttr = document.getElementById("post-message-api").getAttribute("accepted-origins");
+  var allowedOrigins = [];
+  if (allowedOriginsAttr && allowedOriginsAttr.length && allowedOriginsAttr.length > 0) {
+    allowedOrigins = allowedOriginsAttr.split(',');
+  }
+
+  // Verify the sender's origin has been whitelisted
+  function isOriginAllowed(origin) {
+    if (allowedOrigins.length > 0 && allowedOrigins.indexOf(origin) === -1) {
+      console.warn("xdLocalStorage %s origin denied access. Define allowed origins in iframe 'accepted-origins' attribute", origin);
+      return false;
+    } else {
+      return true;
+    }
+  }
 
   var defaultData = {
     namespace: MESSAGE_NAMESPACE
   };
 
-  function postData(id, data) {
+  function postData(id, data, origin) {
+    if (!isOriginAllowed(origin)) {
+      return;
+    }
+
     var mergedData = XdUtils.extend(data, defaultData);
     mergedData.id = id;
-    parent.postMessage(JSON.stringify(mergedData), '*');
+    parent.postMessage(JSON.stringify(mergedData), origin);
   }
 
-  function getData(id, key) {
+  function getData(id, key, origin) {
     var value = localStorage.getItem(key);
     var data = {
       key: key,
       value: value
     };
-    postData(id, data);
+    postData(id, data, origin);
   }
 
-  function setData(id, key, value) {
+  function setData(id, key, value, origin) {
     localStorage.setItem(key, value);
     var checkGet = localStorage.getItem(key);
     var data = {
       success: checkGet === value
     };
-    postData(id, data);
+    postData(id, data, origin);
   }
 
-  function removeData(id, key) {
+  function removeData(id, key, origin) {
     localStorage.removeItem(key);
-    postData(id, {});
+    postData(id, {}, origin);
   }
 
-  function getKey(id, index) {
+  function getKey(id, index, origin) {
     var key = localStorage.key(index);
-    postData(id, {key: key});
+    postData(id, {key: key}, origin);
   }
 
-  function clear(id) {
+  function clear(id, origin) {
     localStorage.clear();
-    postData(id, {});
+    postData(id, {}, origin);
   }
 
   function receiveMessage(event) {
+    if (!isOriginAllowed(event.origin)) {
+      return;
+    }
+
     var data;
     try {
       data = JSON.parse(event.data);
@@ -59,15 +82,15 @@
     }
     if (data && data.namespace === MESSAGE_NAMESPACE) {
       if (data.action === 'set') {
-        setData(data.id, data.key, data.value);
+        setData(data.id, data.key, data.value, event.origin);
       } else if (data.action === 'get') {
-        getData(data.id, data.key);
+        getData(data.id, data.key, event.origin);
       } else if (data.action === 'remove') {
-        removeData(data.id, data.key);
+        removeData(data.id, data.key, event.origin);
       } else if (data.action === 'key') {
-        getKey(data.id, data.key);
+        getKey(data.id, data.key, event.origin);
       } else if (data.action === 'clear') {
-        clear(data.id);
+        clear(data.id, event.origin);
       }
     }
   }
