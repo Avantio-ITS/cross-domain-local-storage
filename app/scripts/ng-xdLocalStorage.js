@@ -12,8 +12,10 @@ angular.module('xdLocalStorage', [])
     var unregister = $rootScope.$watch(function () {
       return iframeReady;
     }, function () {
-      apiReady.resolve(true);
-      unregister();
+      if (iframeReady === true) {
+        apiReady.resolve(true);
+        unregister();
+      }
     });
 
     function waitForApi() {
