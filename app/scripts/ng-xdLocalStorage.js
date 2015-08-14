@@ -10,7 +10,8 @@ angular.module('xdLocalStorage', [])
 
     function waitForApi() {
       if (!xdLocalStorage.wasInit()) {
-        throw 'You must init xdLocalStorage in app config before use';
+        apiReady.reject();
+        console.warn('You must init xdLocalStorage in app config before use');
       }
       return apiReady.promise;
     }
