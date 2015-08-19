@@ -22,16 +22,13 @@
     }
   }
 
-  var defaultData = {
-    namespace: MESSAGE_NAMESPACE
-  };
-
   function postData(id, data, origin) {
     if (!isOriginAllowed(origin)) {
       return;
     }
-
-    var mergedData = XdUtils.extend(data, defaultData);
+    var mergedData = XdUtils.extend(data, {
+      namespace: MESSAGE_NAMESPACE
+    });
     mergedData.id = id;
     parent.postMessage(JSON.stringify(mergedData), origin);
   }
