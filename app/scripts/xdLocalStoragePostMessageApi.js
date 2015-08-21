@@ -6,26 +6,28 @@
 (function () {
 
   var MESSAGE_NAMESPACE = 'cross-domain-local-message';
-  var allowedOriginsAttr = document.getElementById("post-message-api").getAttribute("accepted-origins");
-  var allowedOrigins = [];
-  if (allowedOriginsAttr && allowedOriginsAttr.length && allowedOriginsAttr.length > 0) {
-    allowedOrigins = allowedOriginsAttr.split(',');
-  }
+  var postApi = document.getElementById("post-message-api");
+  var allowedOriginsAttr = (postApi && postApi.getAttribute("accepted-origins")) || '';
+  var allowedOrigins = allowedOriginsAttr.split(',');
 
   // Verify the sender's origin has been whitelisted
   function isOriginAllowed(origin) {
-    if (allowedOrigins.length > 0 && allowedOrigins.indexOf(origin) === -1) {
-      console.warn("xdLocalStorage %s origin denied access. Define allowed origins in iframe 'accepted-origins' attribute", origin);
-      return false;
-    } else {
+    if (allowedOrigins.length === 1 && (allowedOrigins[0] === '*' || allowedOrigins[0] === '')) {
+      return true;
+    } 
+    else if (allowedOrigins.length === 0) {
       return true;
     }
+    else if (allowedOrigins.length > 0 && allowedOrigins.indexOf(origin) > -1) {
+      return true;
+    }
+
+    console.warn("xdLocalStorage origin denied access. Define allowed origins in iframe 'accepted-origins' attribute", origin, allowedOrigins);
+    return false;
   }
 
   function postData(id, data, origin) {
-    if (!isOriginAllowed(origin)) {
-      return;
-    }
+    origin = origin || '*';
     var mergedData = XdUtils.extend(data, {
       namespace: MESSAGE_NAMESPACE
     });
