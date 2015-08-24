@@ -29,9 +29,15 @@ angular.module('xdLocalStorage', [])
     return {
       init: function (options) {
         var defer = $q.defer();
-        options.initCallback = function () {
-          apiReady.resolve();
-          defer.resolve();
+        options.initCallback = function (localStorageSupported) {
+          if (localStorageSupported) {
+            apiReady.resolve();
+            defer.resolve();
+          } else {
+            apiReady.reject();
+            defer.reject();
+            console.warn('localStorage not supported in iframe');
+          }
         };
         xdLocalStorage.init(options);
         return defer.promise;

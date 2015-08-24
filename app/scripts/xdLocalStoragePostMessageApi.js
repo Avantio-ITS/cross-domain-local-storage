@@ -10,6 +10,28 @@
   var allowedOriginsAttr = (postApi && postApi.getAttribute("accepted-origins")) || '';
   var allowedOrigins = allowedOriginsAttr.split(',');
 
+  // Checks the browser to see if local storage is supported
+  var browserSupportsLocalStorage = (function () {
+    try {
+      var supported = ('localStorage' in window && window['localStorage'] !== null);
+
+      // When Safari (OS X or iOS) is in private browsing mode, it appears as though localStorage
+      // is available, but trying to call .setItem throws an exception.
+      //
+      // "QUOTA_EXCEEDED_ERR: DOM Exception 22: An attempt was made to add something to storage
+      // that exceeded the quota."
+      if (supported) {
+        var key = '__' + Math.round(Math.random() * 1e7);
+        localStorage.setItem(key, '');
+        localStorage.removeItem(key);
+      }
+
+      return supported;
+    } catch (e) {
+      return false;
+    }
+  }());
+
   // Verify the sender's origin has been whitelisted
   function isOriginAllowed(origin) {
     if (allowedOrigins.length === 1 && (allowedOrigins[0] === '*' || allowedOrigins[0] === '')) {
@@ -103,7 +125,8 @@
   function sendOnLoad() {
     var data = {
       namespace: MESSAGE_NAMESPACE,
-      id: 'iframe-ready'
+      id: 'iframe-ready',
+      localStorageSupported: browserSupportsLocalStorage
     };
     parent.postMessage(JSON.stringify(data), '*');
   }
