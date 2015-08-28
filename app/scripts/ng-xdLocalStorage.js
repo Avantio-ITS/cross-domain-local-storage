@@ -54,6 +54,9 @@ angular.module('xdLocalStorage', [])
       key: function (index) {
         return action('key', index)
       },
+      getAllKeys: function (prefix) {
+        return action('getAllKeys', prefix)
+      },
       clear: function () {
         return action('clear');
       }
