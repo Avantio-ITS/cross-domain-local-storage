@@ -90,6 +90,22 @@
     postData(id, {}, origin);
   }
 
+  function getAllKeys(id, prefix, origin) {
+    var keys = [];
+    var prefixLength = (prefix) ? prefix.length : 0;
+    for (var key in localStorage) {
+      if (prefix) {
+        // Only return keys that are for this prefix
+        if (key.substr(0, prefixLength) === prefix) {
+          keys.push(key);
+        }
+      } else {
+        keys.push(key);
+      }
+    }
+    postData(id, {keys: keys}, origin);
+  }
+
   function receiveMessage(event) {
     if (!isOriginAllowed(event.origin)) {
       return;
@@ -112,6 +128,8 @@
         getKey(data.id, data.key, event.origin);
       } else if (data.action === 'clear') {
         clear(data.id, event.origin);
+      } else if (data.action === 'getAllKeys') {
+        getAllKeys(data.id, data.key, event.origin);
       }
     }
   }
