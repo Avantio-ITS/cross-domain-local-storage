@@ -8,7 +8,7 @@ window.xdLocalStorage = window.xdLocalStorage || (function () {
   var options = {
     iframeId: 'cross-domain-iframe',
     iframeUrl: undefined,
-    initCallback: function (localStorageSupported) {}
+    initCallback: function (/*localStorageSupported*/) {}
   };
   var requestId = -1;
   var iframe;

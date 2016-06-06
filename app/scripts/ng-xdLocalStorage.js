@@ -3,9 +3,10 @@
  */
 'use strict';
 /* global xdLocalStorage */
+/* global console */
 
 angular.module('xdLocalStorage', [])
-  .service('xdLocalStorage', ['$q', '$rootScope', function ($q, $rootScope) {
+  .service('xdLocalStorage', ['$q', function ($q) {
     var apiReady = $q.defer();
 
     function waitForApi() {
@@ -52,10 +53,10 @@ angular.module('xdLocalStorage', [])
         return action('removeItem', key);
       },
       key: function (index) {
-        return action('key', index)
+        return action('key', index);
       },
       getAllKeys: function (prefix) {
-        return action('getAllKeys', prefix)
+        return action('getAllKeys', prefix);
       },
       clear: function () {
         return action('clear');

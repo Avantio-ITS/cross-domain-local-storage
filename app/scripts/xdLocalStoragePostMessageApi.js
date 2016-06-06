@@ -3,11 +3,13 @@
  */
 'use strict';
 /* global XdUtils */
+/* global console */
+/*jshint -W069 */
 (function () {
 
   var MESSAGE_NAMESPACE = 'cross-domain-local-message';
-  var postApi = document.getElementById("post-message-api");
-  var allowedOriginsAttr = (postApi && postApi.getAttribute("accepted-origins")) || '';
+  var postApi = document.getElementById('post-message-api');
+  var allowedOriginsAttr = (postApi && postApi.getAttribute('accepted-origins')) || '';
   var allowedOrigins = allowedOriginsAttr.split(',');
 
   // Checks the browser to see if local storage is supported
@@ -18,8 +20,8 @@
       // When Safari (OS X or iOS) is in private browsing mode, it appears as though localStorage
       // is available, but trying to call .setItem throws an exception.
       //
-      // "QUOTA_EXCEEDED_ERR: DOM Exception 22: An attempt was made to add something to storage
-      // that exceeded the quota."
+      // 'QUOTA_EXCEEDED_ERR: DOM Exception 22: An attempt was made to add something to storage
+      // that exceeded the quota.'
       if (supported) {
         var key = '__' + Math.round(Math.random() * 1e7);
         localStorage.setItem(key, '');
@@ -36,7 +38,7 @@
   function isOriginAllowed(origin) {
     if (allowedOrigins.length === 1 && (allowedOrigins[0] === '*' || allowedOrigins[0] === '')) {
       return true;
-    } 
+    }
     else if (allowedOrigins.length === 0) {
       return true;
     }
@@ -44,7 +46,7 @@
       return true;
     }
 
-    console.warn("xdLocalStorage origin denied access. Define allowed origins in iframe 'accepted-origins' attribute", origin, allowedOrigins);
+    console.warn('xdLocalStorage origin denied access. Define allowed origins in iframe \'accepted-origins\' attribute', origin, allowedOrigins);
     return false;
   }
 

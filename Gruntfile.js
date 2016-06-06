@@ -414,13 +414,13 @@ module.exports = function (grunt) {
     /*'modernizr',*/
     /*'rev',*/
     'usemin',
-    'htmlmin',
-    'karma:unit'
+    'htmlmin'
+    //'karma:unit'
   ]);
 
   grunt.registerTask('default', [
     'newer:jshint',
-    'test',
+    //'test',
     'build'
   ]);
 };
